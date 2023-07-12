@@ -1,0 +1,25 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ViewActivity"
+    android:background="#3C131212"
+    android:scrollbars="vertical|horizontal"
+    android:fillViewport="true">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/toolbarview1"
+            layout="@layout/toolbar_view" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/toolbarview1" />
+
+    </RelativeLayout>
+</ScrollView>

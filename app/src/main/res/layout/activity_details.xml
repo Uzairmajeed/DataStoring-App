@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3C131212"
+    android:scrollbars="vertical|horizontal"
+    android:fillViewport="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toTopOf="@+id/textViewBio"
+        app:layout_constraintTop_toTopOf="@+id/textViewBio"
+        tools:layout_editor_absoluteX="10dp"
+        tools:layout_editor_absoluteY="10dp">
+        <include
+            android:id="@+id/toolbarview1"
+            layout="@layout/toolbar_details" />
+
+
+
+        <TextView
+            android:id="@+id/textViewBio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="297dp"
+            android:scrollbars="vertical|horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewPhone"
+            tools:text="Bio" />
+
+        <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:id="@+id/textViewAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/textViewPhone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewName"
+            tools:text="Address" />
+
+        <TextView
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:id="@+id/textViewPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/textViewBio"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAddress"
+            tools:text="Phone" />
+
+        <TextView
+            android:id="@+id/textViewName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintBottom_toTopOf="@+id/textViewAddress"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            tools:text="Name" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="200dp"
+            android:layout_height="200dp"
+            android:layout_marginTop="65dp"
+            android:layout_marginBottom="79dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintBottom_toTopOf="@+id/textViewName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@drawable/image" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

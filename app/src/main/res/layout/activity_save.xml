@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#3C131212"
+    tools:context=".save_activity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <include
+            android:id="@+id/toolbarview1"
+            layout="@layout/toolbar_save" />
+
+        <EditText
+            android:id="@+id/editTextName"
+            android:layout_width="383dp"
+            android:padding="15dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_700"
+            android:hint="Name"
+            app:layout_constraintTop_toBottomOf="@id/toolbarview1"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteX="12dp"
+            tools:layout_editor_absoluteY="70dp" />
+
+        <EditText
+            android:id="@+id/editTextBio"
+            android:padding="15dp"
+            android:layout_width="385dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_700"
+            android:hint="Bio"
+            app:layout_constraintTop_toBottomOf="@+id/editTextPhone"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:scrollbars="vertical|horizontal"
+            tools:layout_editor_absoluteX="13dp"
+            tools:layout_editor_absoluteY="225dp" />
+
+        <EditText
+            android:id="@+id/editTextPhone"
+            android:padding="15dp"
+            android:layout_width="385dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_700"
+            android:hint="Phone Number"
+            app:layout_constraintTop_toBottomOf="@+id/editTextAddress"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteX="13dp"
+            tools:layout_editor_absoluteY="170dp" />
+
+        <!-- ImageView -->
+
+        <EditText
+            android:id="@+id/editTextAddress"
+            android:layout_width="387dp"
+            android:padding="15dp"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/teal_700"
+            android:hint="Address"
+            app:layout_constraintTop_toBottomOf="@+id/editTextName"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteX="12dp"
+            tools:layout_editor_absoluteY="115dp" />
+
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintTop_toBottomOf="@+id/editTextBio"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteX="165dp"
+            tools:layout_editor_absoluteY="294dp" />
+
+        <Button
+            android:id="@+id/buttonSaves"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#20655E"
+            android:text="Save"
+            app:layout_constraintTop_toBottomOf="@+id/buttonUploadImage"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:cornerRadius="12dp"
+            tools:layout_editor_absoluteX="161dp"
+            tools:layout_editor_absoluteY="446dp" />
+
+        <Button
+            android:id="@+id/buttonUploadImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#20655E"
+            android:text="Upload Image"
+            app:cornerRadius="12dp"
+            app:layout_constraintTop_toBottomOf="@+id/imageView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:layout_editor_absoluteX="132dp"
+            tools:layout_editor_absoluteY="388dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
