@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -159,14 +160,19 @@ public class save_activity extends AppCompatActivity {
                 String phone = editphone.getText().toString();
                 String address = editaddress.getText().toString();
 
-                // Generate a unique identifier for the image file
-                String imageFileName = UUID.randomUUID().toString() + ".png";
-
-                // Get the bitmap from the ImageView
-                Bitmap imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
+                // Check if an image is selected
+                Drawable drawable = imageView.getDrawable();
+                Bitmap imageBitmap = null;
+                if (drawable instanceof BitmapDrawable) {
+                    imageBitmap = ((BitmapDrawable) drawable).getBitmap();
+                }
 
                 // Save the image to a file
-                saveImageToFile(imageBitmap, imageFileName);
+                String imageFileName = "";
+                if (imageBitmap != null) {
+                    imageFileName = UUID.randomUUID().toString() + ".png";
+                    saveImageToFile(imageBitmap, imageFileName);
+                }
 
                 // Create an instance of ImageData with the name, image path, bio, phone, and address
                 String imagePath = getFilesDir() + "/" + imageFileName;
@@ -190,6 +196,8 @@ public class save_activity extends AppCompatActivity {
                 finish(); // Optional: Close the current activity to prevent going back to it with the back button
             }
         });
+
+
 
         buttonupload.setOnClickListener(new View.OnClickListener() {
             @Override

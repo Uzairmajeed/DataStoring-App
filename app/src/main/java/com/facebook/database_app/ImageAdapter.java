@@ -1,8 +1,6 @@
 package com.facebook.database_app;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +10,16 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
-
     private Context context;
     private List<ImageData> imageDataList;
-    private OnItemClickListener onItemClickListener; // Custom click listener interface
+    private int imageWidth;
+    private int imageHeight;
+    private OnItemClickListener onItemClickListener;
 
     public interface OnItemClickListener {
         void onItemClick(int position);
@@ -33,6 +34,12 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         this.imageDataList = imageDataList;
     }
 
+    public void setImageDimensions(int width, int height) {
+        this.imageWidth = width;
+        this.imageHeight = height;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -43,15 +50,23 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     @Override
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         ImageData imageData = imageDataList.get(position);
+
+        ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
+        layoutParams.width = imageWidth;
+        layoutParams.height = imageHeight;
+        holder.imageView.setLayoutParams(layoutParams);
+
         holder.textViewName.setText(imageData.getName());
 
         if (imageData.getImagePath() == null || imageData.getImagePath().isEmpty()) {
-            holder.imageView.setImageResource(R.drawable.image); // Set a default image if the image path is null or empty
+            // Use the default image resource
+            holder.imageView.setImageResource(R.drawable.image2);
         } else {
-            Bitmap imageBitmap = BitmapFactory.decodeFile(imageData.getImagePath());
-            holder.imageView.setImageBitmap(imageBitmap);
+            Glide.with(context).load(imageData.getImagePath()).into(holder.imageView);
         }
     }
+
+
 
     @Override
     public int getItemCount() {
@@ -85,3 +100,4 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         }
     }
 }
+

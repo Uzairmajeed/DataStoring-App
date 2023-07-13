@@ -5,8 +5,10 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.ImageButton;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,19 +17,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import androidx.appcompat.widget.Toolbar;
-
-
-
 
 public class ViewActivity extends AppCompatActivity {
-    private Toolbar toolbar1;
     private ImageButton backButton;
-
     private RecyclerView recyclerView;
     private List<ImageData> imageDataList;
     private ImageAdapter imageAdapter;
-
     private SharedPreferences sharedPreferences;
     private static final String SHARED_PREF_NAME = "my_shared_pref";
     private static final String KEY_NAME = "name";
@@ -35,14 +30,16 @@ public class ViewActivity extends AppCompatActivity {
     private static final String KEY_BIO = "bio";
     private static final String KEY_PHONE = "phone";
     private static final String KEY_ADDRESS = "address";
+    private int columns;
+    private int imageWidth;
+    private int imageHeight;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-        backButton=findViewById(R.id.backButton);
-        toolbar1= findViewById(R.id.toolbarview);
-        setSupportActionBar(toolbar1);
+
+        backButton = findViewById(R.id.backButton);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -54,10 +51,8 @@ public class ViewActivity extends AppCompatActivity {
         });
 
         recyclerView = findViewById(R.id.recyclerView);
-
-        // Set the initial number of columns based on the screen orientation
-        int initialColumns = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
-        recyclerView.setLayoutManager(new GridLayoutManager(this, initialColumns));
+        columns = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 6;
+        setupRecyclerView(columns);
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
 
@@ -85,7 +80,6 @@ public class ViewActivity extends AppCompatActivity {
             }
         }
 
-        // Inside the ViewActivity
         if (imageDataList.isEmpty()) {
             Toast.makeText(this, "No data available", Toast.LENGTH_SHORT).show();
         } else {
@@ -111,7 +105,25 @@ public class ViewActivity extends AppCompatActivity {
         }
     }
 
-    // Helper method to sort the entries by keys
+    private void setupRecyclerView(int columns) {
+        GridLayoutManager layoutManager = new GridLayoutManager(this, columns);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                recyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                int totalWidth = recyclerView.getWidth();
+                int spacing = recyclerView.getPaddingStart() * (columns - 1);
+                int availableWidth = totalWidth - spacing;
+                imageWidth = availableWidth / columns;
+                imageHeight = imageWidth; // Square images
+
+                // Update the image dimensions in the ImageAdapter
+                imageAdapter.setImageDimensions(imageWidth, imageHeight);
+            }
+        });
+    }
+
     private LinkedHashMap<String, String> sortEntriesByKeys(Map<String, ?> allEntries) {
         LinkedHashMap<String, String> sortedEntries = new LinkedHashMap<>();
         List<String> keys = new ArrayList<>(allEntries.keySet());
@@ -126,12 +138,11 @@ public class ViewActivity extends AppCompatActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-
-        // Update the number of columns based on the new screen orientation
-        int newColumns = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
-        ((GridLayoutManager) recyclerView.getLayoutManager()).setSpanCount(newColumns);
+        columns = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 6;
+        setupRecyclerView(columns);
     }
 }
+
 
 
 
