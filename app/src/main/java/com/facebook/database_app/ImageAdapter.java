@@ -1,6 +1,8 @@
 package com.facebook.database_app;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,14 +61,17 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         holder.textViewName.setText(imageData.getName());
 
         if (imageData.getImagePath() == null || imageData.getImagePath().isEmpty()) {
-            // Use the default image resource
-            holder.imageView.setImageResource(R.drawable.image2);
+            Glide.with(context)
+                    .clear(holder.imageView); // Clear any previous image set with Glide
+            holder.imageView.setImageResource(R.drawable.image2); // Set a default image
         } else {
-            Glide.with(context).load(imageData.getImagePath()).into(holder.imageView);
+            Glide.with(context)
+                    .load(imageData.getImagePath())
+                    .placeholder(R.drawable.image2) // Set a placeholder image while loading
+                    .error(R.drawable.image2) // Set an error image if loading fails
+                    .into(holder.imageView);
         }
     }
-
-
 
     @Override
     public int getItemCount() {
@@ -100,4 +105,3 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         }
     }
 }
-

@@ -33,9 +33,10 @@ public class DetailsActivity extends AppCompatActivity {
         textViewBio = findViewById(R.id.textViewBio);
         textViewPhone = findViewById(R.id.textViewPhone);
         textViewAddress = findViewById(R.id.textViewAddress);
-        backButton=findViewById(R.id.backButton);
-        toolbar1= findViewById(R.id.toolbardetails);
+        backButton = findViewById(R.id.backButton);
+        toolbar1 = findViewById(R.id.toolbardetails);
         setSupportActionBar(toolbar1);
+
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -48,15 +49,12 @@ public class DetailsActivity extends AppCompatActivity {
 
         // Retrieve the data passed from ViewActivity
         Intent intent = getIntent();
-        int position = intent.getIntExtra("position", -1); // Retrieve the position of the item
         String name = intent.getStringExtra("name");
-        Bitmap imageBitmap = intent.getParcelableExtra("imageBitmap");
         String bio = intent.getStringExtra("bio");
         String phone = intent.getStringExtra("phone");
         String address = intent.getStringExtra("address");
 
-// Set the image and details
-        imageView.setImageBitmap(imageBitmap);
+        // Set the text details
         textViewName.setText("Name: " + name);
         textViewBio.setText("Bio: " + bio);
         textViewPhone.setText("Phone No: " + phone);
@@ -64,12 +62,17 @@ public class DetailsActivity extends AppCompatActivity {
 
         // Retrieve the image path from the intent extras
         String imagePath = intent.getStringExtra("imagePath");
-        if (imagePath != null && !imagePath.isEmpty()) {
-            // Load the image from the specified path
-            Bitmap imageBitmap1 = BitmapFactory.decodeFile(imagePath);
-            imageView.setImageBitmap(imageBitmap1);
+
+        if (imagePath == null || imagePath.isEmpty()) {
+            imageView.setImageResource(R.drawable.image2); // Set the default image resource
         } else {
-            imageView.setImageResource(R.drawable.image); // Set a default image if no image is found
+            Bitmap imageBitmap = BitmapFactory.decodeFile(imagePath);
+            if (imageBitmap != null) {
+                imageView.setImageBitmap(imageBitmap);
+            } else {
+                imageView.setImageResource(R.drawable.image2); // Set the default image resource
+            }
         }
     }
+
 }

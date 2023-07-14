@@ -82,28 +82,29 @@ public class ViewActivity extends AppCompatActivity {
 
         if (imageDataList.isEmpty()) {
             Toast.makeText(this, "No data available", Toast.LENGTH_SHORT).show();
-        } else {
-            imageAdapter = new ImageAdapter(this, imageDataList);
-            recyclerView.setAdapter(imageAdapter);
-            imageAdapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
-                @Override
-                public void onItemClick(int position) {
-                    ImageData imageData = imageAdapter.getImageData(position);
-                    if (imageData != null) {
-                        Intent intent = new Intent(ViewActivity.this, DetailsActivity.class);
-                        intent.putExtra("name", imageData.getName());
-                        intent.putExtra("imagePath", imageData.getImagePath());
-                        intent.putExtra("bio", imageData.getBio());
-                        intent.putExtra("phone", imageData.getPhone());
-                        intent.putExtra("address", imageData.getAddress());
-                        startActivity(intent);
-                    } else {
-                        Toast.makeText(ViewActivity.this, "Invalid item position", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
         }
+
+        imageAdapter = new ImageAdapter(this, imageDataList);
+        recyclerView.setAdapter(imageAdapter);
+        imageAdapter.setOnItemClickListener(new ImageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(int position) {
+                ImageData imageData = imageAdapter.getImageData(position);
+                if (imageData != null) {
+                    Intent intent = new Intent(ViewActivity.this, DetailsActivity.class);
+                    intent.putExtra("name", imageData.getName());
+                    intent.putExtra("imagePath", imageData.getImagePath() != null ? imageData.getImagePath() : "");
+                    intent.putExtra("bio", imageData.getBio());
+                    intent.putExtra("phone", imageData.getPhone());
+                    intent.putExtra("address", imageData.getAddress());
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(ViewActivity.this, "Invalid item position", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
+
 
     private void setupRecyclerView(int columns) {
         GridLayoutManager layoutManager = new GridLayoutManager(this, columns);
@@ -142,7 +143,3 @@ public class ViewActivity extends AppCompatActivity {
         setupRecyclerView(columns);
     }
 }
-
-
-
-

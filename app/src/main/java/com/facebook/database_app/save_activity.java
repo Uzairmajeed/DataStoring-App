@@ -160,22 +160,22 @@ public class save_activity extends AppCompatActivity {
                 String phone = editphone.getText().toString();
                 String address = editaddress.getText().toString();
 
+                // Generate a unique identifier for the image file
+                String imageFileName = UUID.randomUUID().toString() + ".png";
+
                 // Check if an image is selected
-                Drawable drawable = imageView.getDrawable();
                 Bitmap imageBitmap = null;
-                if (drawable instanceof BitmapDrawable) {
-                    imageBitmap = ((BitmapDrawable) drawable).getBitmap();
+                if (imageView.getDrawable() != null) {
+                    imageBitmap = ((BitmapDrawable) imageView.getDrawable()).getBitmap();
                 }
 
-                // Save the image to a file
-                String imageFileName = "";
+                // Save the image to a file if imageBitmap is not null
                 if (imageBitmap != null) {
-                    imageFileName = UUID.randomUUID().toString() + ".png";
                     saveImageToFile(imageBitmap, imageFileName);
                 }
 
                 // Create an instance of ImageData with the name, image path, bio, phone, and address
-                String imagePath = getFilesDir() + "/" + imageFileName;
+                String imagePath = imageBitmap != null ? getFilesDir() + "/" + imageFileName : ""; // Set imagePath to empty string if no image is selected
                 ImageData imageData = new ImageData(name, imagePath, bio, phone, address);
 
                 // Generate a unique identifier for the data entry
@@ -196,6 +196,7 @@ public class save_activity extends AppCompatActivity {
                 finish(); // Optional: Close the current activity to prevent going back to it with the back button
             }
         });
+
 
 
 
