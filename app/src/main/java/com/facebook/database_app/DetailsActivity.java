@@ -21,6 +21,8 @@ public class DetailsActivity extends AppCompatActivity {
 
     private ImageView imageView;
     private TextView textViewName, textViewBio, textViewPhone, textViewAddress;
+    private TextView textViewEmail;
+    private TextView textViewGender;
 
 
     @Override
@@ -33,6 +35,8 @@ public class DetailsActivity extends AppCompatActivity {
         textViewBio = findViewById(R.id.textViewBio);
         textViewPhone = findViewById(R.id.textViewPhone);
         textViewAddress = findViewById(R.id.textViewAddress);
+        textViewEmail = findViewById(R.id.textViewEmail);
+        textViewGender = findViewById(R.id.textViewGender);
         backButton = findViewById(R.id.backButton);
         toolbar1 = findViewById(R.id.toolbardetails);
         setSupportActionBar(toolbar1);
@@ -53,12 +57,16 @@ public class DetailsActivity extends AppCompatActivity {
         String bio = intent.getStringExtra("bio");
         String phone = intent.getStringExtra("phone");
         String address = intent.getStringExtra("address");
+        String email = intent.getStringExtra("email");
+        String gender = intent.getStringExtra("gender");
 
         // Set the text details
         textViewName.setText("Name: " + name);
         textViewBio.setText("Bio: " + bio);
         textViewPhone.setText("Phone No: " + phone);
         textViewAddress.setText("Address: " + address);
+        textViewEmail.setText("Email: "+email);
+        textViewGender.setText("Gender: "+gender);
 
         // Retrieve the image path from the intent extras
         String imagePath = intent.getStringExtra("imagePath");

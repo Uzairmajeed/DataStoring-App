@@ -20,6 +20,7 @@ import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -28,6 +29,7 @@ import android.widget.ImageView;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 import android.content.Intent;
@@ -61,10 +63,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -75,8 +79,9 @@ import java.util.UUID;
 public class save_activity extends AppCompatActivity {
     private Toolbar toolbar1;
     private ImageButton backButton;
-    private EditText editname, editphone, editbio, editaddress;
+    private EditText editname, editphone, editbio, editaddress,editTextEmail;
     private Button buttonsave, buttonupload;
+    private Spinner spinnerGender;
     private ImageView imageView;
     private SharedPreferences sharedPreferences;
     private static final String SHARED_PREF_NAME = "my_shared_pref";
@@ -84,13 +89,29 @@ public class save_activity extends AppCompatActivity {
     private static final String KEY_BIO = "bio";
     private static final String KEY_PHONE = "phone";
     private static final String KEY_ADDRESS = "address";
+    private static final String KEY_EMAIL = "email";
+    private static final String KEY_GENDER = "gender";
+
     private static final String KEY_IMAGE_PATH = "image_path";
     private static final int REQUEST_IMAGE_GALLERY = 1000;
+
+    private RecyclerView recyclerViewMen;
+    private RecyclerView recyclerViewWomen;
+    private RecyclerView recyclerViewOthers;
+    private ImageAdapter imageAdapterMen;
+    private ImageAdapter imageAdapterWomen;
+    private ImageAdapter imageAdapterOthers;
+    private List<ImageData> imageDataListMen;
+    private List<ImageData> imageDataListWomen;
+    private List<ImageData> imageDataListOthers;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save);
+        editTextEmail = findViewById(R.id.editTextEmail);
+        spinnerGender = findViewById(R.id.spinnerGender);
         editname = findViewById(R.id.editTextName);
         editphone = findViewById(R.id.editTextPhone);
         editbio = findViewById(R.id.editTextBio);
@@ -98,6 +119,13 @@ public class save_activity extends AppCompatActivity {
         buttonsave = findViewById(R.id.buttonSaves);
         buttonupload = findViewById(R.id.buttonUploadImage);
         imageView = findViewById(R.id.imageView);
+        // Set the adapter for the gender spinner
+        ArrayAdapter<CharSequence> genderAdapter = ArrayAdapter.createFromResource(this,
+                R.array.gender_options, android.R.layout.simple_spinner_item);
+        genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerGender.setAdapter(genderAdapter);
+
+
         editphone.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -119,11 +147,31 @@ public class save_activity extends AppCompatActivity {
                     buttonsave.setEnabled(false);
                 } else {
                     editphone.setError(null);
-                    buttonsave.setEnabled(true);
                 }
             }
         });
+        buttonsave.setEnabled(false);
 
+        editTextEmail.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String input = s.toString();
+                if (input.matches(".*\\d.*") && input.matches(".*[a-zA-Z].*") && input.matches(".*[@].*")) {
+                    editTextEmail.setError(null);
+                    buttonsave.setEnabled(true);
+                } else {
+                    editTextEmail.setError("Please enter a combination of alphanumeric characters with at least one '@' symbol");
+                }
+            }
+        });
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
         backButton=findViewById(R.id.backButton);
@@ -159,6 +207,8 @@ public class save_activity extends AppCompatActivity {
                 String bio = editbio.getText().toString();
                 String phone = editphone.getText().toString();
                 String address = editaddress.getText().toString();
+                String email = editTextEmail.getText().toString();
+                String gender = spinnerGender.getSelectedItem().toString();
 
                 // Generate a unique identifier for the image file
                 String imageFileName = UUID.randomUUID().toString() + ".png";
@@ -174,9 +224,9 @@ public class save_activity extends AppCompatActivity {
                     saveImageToFile(imageBitmap, imageFileName);
                 }
 
-                // Create an instance of ImageData with the name, image path, bio, phone, and address
-                String imagePath = imageBitmap != null ? getFilesDir() + "/" + imageFileName : ""; // Set imagePath to empty string if no image is selected
-                ImageData imageData = new ImageData(name, imagePath, bio, phone, address);
+                // Create an instance of ImageData with the details
+                String imagePath = imageBitmap != null ? getFilesDir() + "/" + imageFileName : "";
+                ImageData imageData = new ImageData(name, imagePath, bio, phone, address, email, gender);
 
                 // Generate a unique identifier for the data entry
                 String uniqueId = UUID.randomUUID().toString();
@@ -188,6 +238,8 @@ public class save_activity extends AppCompatActivity {
                 editor.putString(KEY_BIO + "_" + uniqueId, imageData.getBio());
                 editor.putString(KEY_PHONE + "_" + uniqueId, imageData.getPhone());
                 editor.putString(KEY_ADDRESS + "_" + uniqueId, imageData.getAddress());
+                editor.putString(KEY_EMAIL + "_" + uniqueId, imageData.getEmail());
+                editor.putString(KEY_GENDER + "_" + uniqueId, imageData.getGender());
                 editor.apply();
 
                 // Navigate back to MainActivity
@@ -210,9 +262,11 @@ public class save_activity extends AppCompatActivity {
         });
     }
 
+
     private boolean isValidPhoneNumber(String phoneNumber) {
         return phoneNumber.matches("[0-9]+") && phoneNumber.length() == 10;
     }
+
 
 
     // Helper method to save the image bitmap to a file

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#3C131212"
+    android:background="@drawable/backgroud_middle"
     android:scrollbars="vertical|horizontal"
     android:fillViewport="true">
 
@@ -21,37 +21,70 @@
             layout="@layout/toolbar_details" />
 
 
-
         <TextView
             android:id="@+id/textViewBio"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/backgroud_spinner"            android:paddingStart="10dp"
             android:layout_marginBottom="297dp"
             android:scrollbars="vertical|horizontal"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/textViewEmail"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewPhone"
             tools:text="Bio" />
 
         <TextView
+            android:id="@+id/textViewEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="297dp"
+            android:background="@drawable/backgroud_spinner"            android:paddingStart="10dp"
+            android:scrollbars="vertical|horizontal"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewBio"
+
+            tools:text="Email" />
+
+        <TextView
+            android:id="@+id/textViewGender"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="297dp"
+            android:background="@drawable/backgroud_spinner"            android:paddingStart="10dp"
+            android:scrollbars="vertical|horizontal"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewEmail"
+            tools:text="Gender" />
+
+
+        <TextView
             android:id="@+id/textViewAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintBottom_toTopOf="@+id/textViewPhone"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
+            android:paddingStart="10dp"
             app:layout_constraintTop_toBottomOf="@+id/textViewName"
-            tools:text="Address" />
-
+            tools:text="Address"
+            android:background="@drawable/backgroud_spinner"/>
         <TextView
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:id="@+id/textViewPhone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/backgroud_spinner"
+            android:paddingStart="10dp"
             app:layout_constraintBottom_toTopOf="@+id/textViewBio"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,7 +95,8 @@
             android:id="@+id/textViewName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
+            android:background="@drawable/backgroud_spinner"
+            android:paddingStart="10dp"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintBottom_toTopOf="@+id/textViewAddress"
             app:layout_constraintEnd_toEndOf="parent"

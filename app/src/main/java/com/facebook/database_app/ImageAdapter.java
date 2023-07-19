@@ -1,6 +1,8 @@
 package com.facebook.database_app;
 
 import android.content.Context;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -8,8 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.view.ViewGroup.LayoutParams;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -22,18 +27,37 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     private int imageWidth;
     private int imageHeight;
     private OnItemClickListener onItemClickListener;
+    private boolean isGridBased;
+    private int gridSpanCount;
 
     public interface OnItemClickListener {
-        void onItemClick(int position);
+        void onItemClick(ImageData imageData);
     }
 
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
-    public ImageAdapter(Context context, List<ImageData> imageDataList) {
+    public ImageAdapter(Context context, List<ImageData> imageDataList, boolean isGridBased) {
         this.context = context;
         this.imageDataList = imageDataList;
+        this.isGridBased = isGridBased;
+        this.gridSpanCount = calculateGridSpanCount();
+    }
+
+    private int calculateGridSpanCount() {
+        int orientation = context.getResources().getConfiguration().orientation;
+        if (isGridBased && orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return 3;
+        } else {
+            return 6;
+        }
+    }
+
+
+    public void setGridSpanCount() {
+        this.gridSpanCount = calculateGridSpanCount();
+        notifyDataSetChanged();
     }
 
     public void setImageDimensions(int width, int height) {
@@ -53,16 +77,9 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     public void onBindViewHolder(@NonNull ImageViewHolder holder, int position) {
         ImageData imageData = imageDataList.get(position);
 
-        ViewGroup.LayoutParams layoutParams = holder.imageView.getLayoutParams();
-        layoutParams.width = imageWidth;
-        layoutParams.height = imageHeight;
-        holder.imageView.setLayoutParams(layoutParams);
-
         holder.textViewName.setText(imageData.getName());
 
         if (imageData.getImagePath() == null || imageData.getImagePath().isEmpty()) {
-            Glide.with(context)
-                    .clear(holder.imageView); // Clear any previous image set with Glide
             holder.imageView.setImageResource(R.drawable.image2); // Set a default image
         } else {
             Glide.with(context)
@@ -71,7 +88,61 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
                     .error(R.drawable.image2) // Set an error image if loading fails
                     .into(holder.imageView);
         }
+        if (isGridBased) {
+            // Adjust the image view size for grid layout
+            adjustItemSize(holder.itemView);
+        } else {
+            // Reset the image view size for list layout
+            resetItemSize(holder.itemView);
+        }
+
+
+        holder.imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (context instanceof ViewActivity) {
+                    ((ViewActivity) context).navigateToDetailsActivity(imageData);
+                }
+            }
+        });
+
     }
+
+    private void adjustItemSize(View itemView) {
+        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+        if (isGridBased) {
+            int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
+            int itemWidth = screenWidth / gridSpanCount;
+
+            layoutParams.width = itemWidth;
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        } else {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+        itemView.setLayoutParams(layoutParams);
+    }
+
+
+    public void setGridBased(boolean gridBased) {
+        isGridBased = gridBased;
+        notifyDataSetChanged();
+    }
+
+
+    public void resetItemSize(View itemView) {
+        ViewGroup.LayoutParams layoutParams = itemView.getLayoutParams();
+        layoutParams.width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        itemView.setLayoutParams(layoutParams);
+    }
+
+    public void setGridSpanCount(int spanCount) {
+        this.gridSpanCount = spanCount;
+        notifyDataSetChanged();
+    }
+
+
 
     @Override
     public int getItemCount() {
@@ -85,7 +156,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
         return null;
     }
 
-    class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ImageViewHolder extends RecyclerView.ViewHolder {
         ImageView imageView;
         TextView textViewName;
 
@@ -93,15 +164,6 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
             super(itemView);
             imageView = itemView.findViewById(R.id.imageView);
             textViewName = itemView.findViewById(R.id.textViewName);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            int position = getAdapterPosition();
-            if (position != RecyclerView.NO_POSITION && onItemClickListener != null) {
-                onItemClickListener.onItemClick(position);
-            }
         }
     }
 }
