@@ -9,5 +9,6 @@
     <string-array name="layout_style_options">
         <item>Linear-based</item>
         <item>Grid-based</item>
+        <item>List-based</item>
     </string-array>
 </resources>

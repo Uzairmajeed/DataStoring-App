@@ -10,6 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -32,11 +33,6 @@ public class ViewActivity extends AppCompatActivity {
     private List<ImageData> imageDataListWomen;
     private List<ImageData> imageDataListOthers;
     private SharedPreferences sharedPreferences;
-
-    private int columns;
-    private int imageWidth;
-    private int imageHeight;
-
     private static final String SHARED_PREF_NAME = "my_shared_pref";
     private static final String KEY_NAME = "name";
     private static final String KEY_IMAGE_PATH = "image_path";
@@ -57,7 +53,6 @@ public class ViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view);
-
         backButton = findViewById(R.id.backButton);
         spinnerLayoutStyle = findViewById(R.id.spinnerLayoutStyle);
 
@@ -136,13 +131,25 @@ public class ViewActivity extends AppCompatActivity {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.layout_style_options, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerLayoutStyle.setAdapter(adapter);
+        // Retrieve the saved spinner position from SharedPreferences
+        int spinnerPosition = sharedPreferences.getInt("spinner_position", spinnerLayoutStyle.getSelectedItemPosition());
+        spinnerLayoutStyle.setSelection(spinnerPosition);
         spinnerLayoutStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Update the layout style based on the spinner selection
-                isGridBased = position == 1;
-                setGridSpanCount(); // Set the grid span count based on the isGridBased flag
-                setLayoutStyle(isGridBased);
+                String selectedOption = parent.getItemAtPosition(position).toString();
+                if (selectedOption.equals(getString(R.string.list_based))) {
+                    setLayoutStyleForListBased();
+                } else {
+                    // Update the layout style based on the spinner selection
+                    isGridBased = position == 1;
+                    setGridSpanCount(); // Set the grid span count based on the isGridBased flag
+                    setLayoutStyle(isGridBased);
+                }
+                // Save the selected position in SharedPreferences
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putInt("spinner_position", position);
+                editor.apply();
             }
 
             @Override
@@ -151,6 +158,42 @@ public class ViewActivity extends AppCompatActivity {
         });
     }
 
+    private void setLayoutStyleForListBased() {
+        // Use ListBasedImageAdapter for the "List-based" option
+        ListBasedImageAdapter listBasedImageAdapterMen = new ListBasedImageAdapter(this, imageDataListMen);
+        ListBasedImageAdapter listBasedImageAdapterWomen = new ListBasedImageAdapter(this, imageDataListWomen);
+        ListBasedImageAdapter listBasedImageAdapterOthers = new ListBasedImageAdapter(this, imageDataListOthers);
+
+        // Set item click listener for the ListBasedImageAdapters
+        listBasedImageAdapterMen.setOnItemClickListener(new ListBasedImageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ImageData imageData) {
+                navigateToDetailsActivity(imageData);
+            }
+        });
+
+        listBasedImageAdapterWomen.setOnItemClickListener(new ListBasedImageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ImageData imageData) {
+                navigateToDetailsActivity(imageData);
+            }
+        });
+
+        listBasedImageAdapterOthers.setOnItemClickListener(new ListBasedImageAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(ImageData imageData) {
+                navigateToDetailsActivity(imageData);
+            }
+        });
+
+        recyclerViewMen.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerViewWomen.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        recyclerViewOthers.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+
+        recyclerViewMen.setAdapter(listBasedImageAdapterMen);
+        recyclerViewWomen.setAdapter(listBasedImageAdapterWomen);
+        recyclerViewOthers.setAdapter(listBasedImageAdapterOthers);
+    }
     public void setGridSpanCount() {
         int spanCount = isGridBased ? (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? GRID_SPAN_COUNT_PORTRAIT : GRID_SPAN_COUNT_LANDSCAPE) : 1;
@@ -164,15 +207,13 @@ public class ViewActivity extends AppCompatActivity {
         recyclerViewWomen.setLayoutManager(new GridLayoutManager(this, spanCount));
         recyclerViewOthers.setLayoutManager(new GridLayoutManager(this, spanCount));
     }
-
-
-
     private void setLayoutStyle(boolean isGridBased) {
         this.isGridBased = isGridBased;
 
         if (isGridBased) {
             setGridSpanCount();
 
+            // Set GridLayoutManager for the RecyclerViews
             GridLayoutManager gridLayoutManagerMen = new GridLayoutManager(this, gridSpanCount);
             GridLayoutManager gridLayoutManagerWomen = new GridLayoutManager(this, gridSpanCount);
             GridLayoutManager gridLayoutManagerOthers = new GridLayoutManager(this, gridSpanCount);
@@ -181,11 +222,13 @@ public class ViewActivity extends AppCompatActivity {
             recyclerViewWomen.setLayoutManager(gridLayoutManagerWomen);
             recyclerViewOthers.setLayoutManager(gridLayoutManagerOthers);
 
+            // Use the ImageAdapter for Grid-based layout
             if (imageAdapterMen == null) {
                 imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
                 recyclerViewMen.setAdapter(imageAdapterMen);
             } else {
                 imageAdapterMen.setGridBased(isGridBased);
+                recyclerViewMen.setAdapter(imageAdapterMen);
             }
 
             if (imageAdapterWomen == null) {
@@ -193,6 +236,7 @@ public class ViewActivity extends AppCompatActivity {
                 recyclerViewWomen.setAdapter(imageAdapterWomen);
             } else {
                 imageAdapterWomen.setGridBased(isGridBased);
+                recyclerViewWomen.setAdapter(imageAdapterWomen);
             }
 
             if (imageAdapterOthers == null) {
@@ -200,8 +244,10 @@ public class ViewActivity extends AppCompatActivity {
                 recyclerViewOthers.setAdapter(imageAdapterOthers);
             } else {
                 imageAdapterOthers.setGridBased(isGridBased);
+                recyclerViewOthers.setAdapter(imageAdapterOthers);
             }
         } else {
+            // Set LinearLayoutManager for the RecyclerViews
             LinearLayoutManager layoutManagerMen = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             LinearLayoutManager layoutManagerWomen = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
             LinearLayoutManager layoutManagerOthers = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -210,41 +256,33 @@ public class ViewActivity extends AppCompatActivity {
             recyclerViewWomen.setLayoutManager(layoutManagerWomen);
             recyclerViewOthers.setLayoutManager(layoutManagerOthers);
 
-            // Ensure imageAdapterMen, imageAdapterWomen, and imageAdapterOthers are initialized
-            imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
-            imageAdapterWomen = new ImageAdapter(this, imageDataListWomen, isGridBased);
-            imageAdapterOthers = new ImageAdapter(this, imageDataListOthers, isGridBased);
+            // Use the ImageAdapter for List-based layout
+            if (imageAdapterMen == null) {
+                imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
+                recyclerViewMen.setAdapter(imageAdapterMen);
+            } else {
+                imageAdapterMen.setGridBased(isGridBased);
+                recyclerViewMen.setAdapter(imageAdapterMen);
+            }
 
-            recyclerViewMen.setAdapter(imageAdapterMen);
-            recyclerViewWomen.setAdapter(imageAdapterWomen);
-            recyclerViewOthers.setAdapter(imageAdapterOthers);
+            if (imageAdapterWomen == null) {
+                imageAdapterWomen = new ImageAdapter(this, imageDataListWomen, isGridBased);
+                recyclerViewWomen.setAdapter(imageAdapterWomen);
+            } else {
+                imageAdapterWomen.setGridBased(isGridBased);
+                recyclerViewWomen.setAdapter(imageAdapterWomen);
+            }
 
-            recyclerViewMen.post(new Runnable() {
-                @Override
-                public void run() {
-                    recyclerViewMen.scrollToPosition(0);
-                }
-            });
-
-            recyclerViewWomen.post(new Runnable() {
-                @Override
-                public void run() {
-                    recyclerViewWomen.scrollToPosition(0);
-                }
-            });
-
-            recyclerViewOthers.post(new Runnable() {
-                @Override
-                public void run() {
-                    recyclerViewOthers.scrollToPosition(0);
-                }
-            });
-
-            imageAdapterMen.resetItemSize(recyclerViewMen);
-            imageAdapterWomen.resetItemSize(recyclerViewWomen);
-            imageAdapterOthers.resetItemSize(recyclerViewOthers);
+            if (imageAdapterOthers == null) {
+                imageAdapterOthers = new ImageAdapter(this, imageDataListOthers, isGridBased);
+                recyclerViewOthers.setAdapter(imageAdapterOthers);
+            } else {
+                imageAdapterOthers.setGridBased(isGridBased);
+                recyclerViewOthers.setAdapter(imageAdapterOthers);
+            }
         }
     }
+
 
 
     @Override
@@ -257,5 +295,4 @@ public class ViewActivity extends AppCompatActivity {
             setGridSpanCount();
         }
     }
-
 }
