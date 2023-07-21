@@ -137,14 +137,21 @@ public class ViewActivity extends AppCompatActivity {
         spinnerLayoutStyle.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedOption = parent.getItemAtPosition(position).toString();
-                if (selectedOption.equals(getString(R.string.list_based))) {
-                    setLayoutStyleForListBased();
-                } else {
+                if (position == 0) {
+
+                } else if (position == 1) {
                     // Update the layout style based on the spinner selection
-                    isGridBased = position == 1;
+                    isGridBased = position == 2; // Position 2 corresponds to "Grid-based"
                     setGridSpanCount(); // Set the grid span count based on the isGridBased flag
                     setLayoutStyle(isGridBased);
+
+                } else if (position == 2) {
+                    // Update the layout style based on the spinner selection
+                    isGridBased = position == 2; // Position 2 corresponds to "Grid-based"
+                    setGridSpanCount(); // Set the grid span count based on the isGridBased flag
+                    setLayoutStyle(isGridBased);
+                } else if (position == 3) {
+                    setLayoutStyleForListBased();
                 }
                 // Save the selected position in SharedPreferences
                 SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -157,7 +164,6 @@ public class ViewActivity extends AppCompatActivity {
             }
         });
     }
-
     private void setLayoutStyleForListBased() {
         // Use ListBasedImageAdapter for the "List-based" option
         ListBasedImageAdapter listBasedImageAdapterMen = new ListBasedImageAdapter(this, imageDataListMen);
@@ -194,6 +200,8 @@ public class ViewActivity extends AppCompatActivity {
         recyclerViewWomen.setAdapter(listBasedImageAdapterWomen);
         recyclerViewOthers.setAdapter(listBasedImageAdapterOthers);
     }
+
+
     public void setGridSpanCount() {
         int spanCount = isGridBased ? (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? GRID_SPAN_COUNT_PORTRAIT : GRID_SPAN_COUNT_LANDSCAPE) : 1;

@@ -1,25 +1,30 @@
 package com.facebook.database_app;
 
-
-import static com.facebook.database_app.ImageUtils.bitmapToBase64;
-
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,59 +33,30 @@ import android.widget.ImageView;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.util.List;
 import java.util.UUID;
-
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.Environment;
-import android.util.Base64;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-
-import androidx.appcompat.app.AppCompatActivity;
-
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.UUID;
-
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
-import android.util.Base64;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.util.UUID;
+import com.google.android.material.snackbar.Snackbar;
+
 
 public class save_activity extends AppCompatActivity {
     private Toolbar toolbar1;
     private ImageButton backButton;
-    private EditText editname, editphone, editbio, editaddress,editTextEmail;
+    private EditText editname, editphone, editbio, editaddress, editTextEmail;
     private Button buttonsave, buttonupload;
+    private CoordinatorLayout coordinatorLayout;
     private Spinner spinnerGender;
     private ImageView imageView;
     private SharedPreferences sharedPreferences;
@@ -94,6 +70,8 @@ public class save_activity extends AppCompatActivity {
 
     private static final String KEY_IMAGE_PATH = "image_path";
     private static final int REQUEST_IMAGE_GALLERY = 1000;
+    private static final int REQUEST_NOTIFICATION_PERMISSION = 1;
+
 
     private RecyclerView recyclerViewMen;
     private RecyclerView recyclerViewWomen;
@@ -110,6 +88,7 @@ public class save_activity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_save);
+        coordinatorLayout = findViewById(R.id.coordinator);
         editTextEmail = findViewById(R.id.editTextEmail);
         spinnerGender = findViewById(R.id.spinnerGender);
         editname = findViewById(R.id.editTextName);
@@ -124,6 +103,27 @@ public class save_activity extends AppCompatActivity {
                 R.array.gender_options, android.R.layout.simple_spinner_item);
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(genderAdapter);
+        spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position == 0) {
+                    buttonsave.setEnabled(false);
+                } else if (position == 1) {
+                    buttonsave.setEnabled(true);
+
+                } else if (position == 2) {
+                    buttonsave.setEnabled(true);
+
+                } else if (position == 3) {
+                    buttonsave.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
+
 
 
         editphone.addTextChangedListener(new TextWatcher() {
@@ -144,14 +144,11 @@ public class save_activity extends AppCompatActivity {
                     editphone.setError("Phone number cannot exceed 10 digits");
                 } else if (!isValidPhoneNumber(phoneNumber)) {
                     editphone.setError("Invalid phone number");
-                    buttonsave.setEnabled(false);
                 } else {
                     editphone.setError(null);
                 }
             }
         });
-        buttonsave.setEnabled(false);
-
         editTextEmail.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -166,7 +163,6 @@ public class save_activity extends AppCompatActivity {
                 String input = s.toString();
                 if (input.matches(".*\\d.*") && input.matches(".*[a-zA-Z].*") && input.matches(".*[@].*")) {
                     editTextEmail.setError(null);
-                    buttonsave.setEnabled(true);
                 } else {
                     editTextEmail.setError("Please enter a combination of alphanumeric characters with at least one '@' symbol");
                 }
@@ -174,12 +170,13 @@ public class save_activity extends AppCompatActivity {
         });
 
         sharedPreferences = getSharedPreferences(SHARED_PREF_NAME, MODE_PRIVATE);
-        backButton=findViewById(R.id.backButton);
-        toolbar1= findViewById(R.id.toolbarsave);
+        backButton = findViewById(R.id.backButton);
+        toolbar1 = findViewById(R.id.toolbarsave);
         setSupportActionBar(toolbar1);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 // Navigate back to MainActivity
                 Intent intent = new Intent(save_activity.this, MainActivity.class);
                 startActivity(intent);
@@ -197,6 +194,8 @@ public class save_activity extends AppCompatActivity {
             Bitmap imageBitmap = BitmapFactory.decodeFile(imageBase64);
             imageView.setImageBitmap(imageBitmap);
         }
+
+        createNotificationChannel();
 
         // Inside the buttonsave OnClickListener in save_activity class
         buttonsave.setOnClickListener(new View.OnClickListener() {
@@ -241,17 +240,24 @@ public class save_activity extends AppCompatActivity {
                 editor.putString(KEY_EMAIL + "_" + uniqueId, imageData.getEmail());
                 editor.putString(KEY_GENDER + "_" + uniqueId, imageData.getGender());
                 editor.apply();
+                //Toast.makeText(save_activity.this, "Data Saved", Toast.LENGTH_SHORT).show();
 
-                // Navigate back to MainActivity
-                Intent intent = new Intent(save_activity.this, MainActivity.class);
-                startActivity(intent);
-                finish(); // Optional: Close the current activity to prevent going back to it with the back button
+                notification();
+                snacKbar();
+                // Introduce a 5-second delay before starting the new activity
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Navigate back to MainActivity
+                        Intent intent = new Intent(save_activity.this, MainActivity.class);
+                        startActivity(intent);
+                        finish(); // Optional: Close the current activity to prevent going back to it with the back button
+                    }
+                }, 4000); // 5000 milliseconds = 5 seconds
             }
+
+
         });
-
-
-
-
         buttonupload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -266,7 +272,6 @@ public class save_activity extends AppCompatActivity {
     private boolean isValidPhoneNumber(String phoneNumber) {
         return phoneNumber.matches("[0-9]+") && phoneNumber.length() == 10;
     }
-
 
 
     // Helper method to save the image bitmap to a file
@@ -317,5 +322,53 @@ public class save_activity extends AppCompatActivity {
     private Bitmap base64ToBitmap(String base64String) {
         byte[] decodedBytes = Base64.decode(base64String, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
+    }
+
+   public void snacKbar() {
+        // Show the Snackbar with the message "Data is saved" and an "Undo" button
+        Snackbar snackbar = Snackbar.make(coordinatorLayout, "Data is saved", 3000);
+        snackbar.setAction("Undo", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar snackbar1 = Snackbar.make(coordinatorLayout, "Undo Sucessfull", 3000);
+                snackbar1.show();
+            }
+        });
+        snackbar.show();
+    }
+
+    public void notification() {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(save_activity.this, "My Notification");
+        builder.setContentTitle("DatabaseApp");
+        builder.setContentText("Database_Updated");
+        builder.setSmallIcon(R.drawable.icon);
+        builder.setAutoCancel(true);
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(save_activity.this);
+        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // Request the notification permission
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, REQUEST_NOTIFICATION_PERMISSION);
+            return;
+        }
+        managerCompat.notify(1, builder.build());
+    }
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("My Notification", "My Notification", NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_NOTIFICATION_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted, show the notification
+                notification();
+            } else {
+                // Permission denied, show a message or take appropriate action
+                Toast.makeText(this, "Notification permission denied", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

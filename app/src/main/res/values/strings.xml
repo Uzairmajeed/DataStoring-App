@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">DatabaseApp</string>
     <string name="Select_Gender">SelectGender</string>
+    <string name="select_gender">SelectGender</string>
     <string name="gender">Gender</string>
     <string name="list_based">List-based</string>
     <string name="linear_based">List-based</string>
+    <string name="select_mode">List-based</string>
 
 </resources>

@@ -13,22 +13,9 @@
             android:id="@+id/toolbarview1"
             layout="@layout/toolbar_view" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/toolbarview1"
-            android:text="MODE :"
-            android:background="@drawable/backgroud_spinner"
-            android:paddingStart="5dp"
-            android:paddingEnd="5dp"
-            android:layout_marginTop="14dp"
-            android:layout_toLeftOf="@+id/spinnerLayoutStyle"
-            android:textColor="@color/black"
-            android:textStyle="bold" />
-
         <Spinner
             android:id="@+id/spinnerLayoutStyle"
-            android:layout_width="150dp"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
             android:layout_below="@id/toolbarview1"
             android:layout_alignParentEnd="true"
@@ -36,6 +23,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginEnd="10dp"
             android:backgroundTint="#22321F"
+            android:background="@drawable/backgroud_spinner"
             android:entries="@array/layout_style_options" />
 
         <TextView
