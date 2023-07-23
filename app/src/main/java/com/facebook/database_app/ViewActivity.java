@@ -138,19 +138,17 @@ public class ViewActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (position == 0) {
-
+                    // No action needed for the first item
                 } else if (position == 1) {
-                    // Update the layout style based on the spinner selection
-                    isGridBased = position == 2; // Position 2 corresponds to "Grid-based"
-                    setGridSpanCount(); // Set the grid span count based on the isGridBased flag
-                    setLayoutStyle(isGridBased);
-
+                    setLayoutStyleForHorizontalList();
                 } else if (position == 2) {
                     // Update the layout style based on the spinner selection
-                    isGridBased = position == 2; // Position 2 corresponds to "Grid-based"
+                    isGridBased = true; // Position 1 corresponds to "Grid-based"
                     setGridSpanCount(); // Set the grid span count based on the isGridBased flag
                     setLayoutStyle(isGridBased);
                 } else if (position == 3) {
+                    // Update the layout style based on the spinner selection
+                    isGridBased = false; // Position 3 corresponds to "List-based"
                     setLayoutStyleForListBased();
                 }
                 // Save the selected position in SharedPreferences
@@ -164,6 +162,7 @@ public class ViewActivity extends AppCompatActivity {
             }
         });
     }
+
     private void setLayoutStyleForListBased() {
         // Use ListBasedImageAdapter for the "List-based" option
         ListBasedImageAdapter listBasedImageAdapterMen = new ListBasedImageAdapter(this, imageDataListMen);
@@ -200,8 +199,6 @@ public class ViewActivity extends AppCompatActivity {
         recyclerViewWomen.setAdapter(listBasedImageAdapterWomen);
         recyclerViewOthers.setAdapter(listBasedImageAdapterOthers);
     }
-
-
     public void setGridSpanCount() {
         int spanCount = isGridBased ? (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
                 ? GRID_SPAN_COUNT_PORTRAIT : GRID_SPAN_COUNT_LANDSCAPE) : 1;
@@ -291,16 +288,143 @@ public class ViewActivity extends AppCompatActivity {
         }
     }
 
+    private void updateLayoutStyle(boolean isGridBased) {
+        setLayoutStyle(isGridBased);
+
+        // Get the selected position of the spinner
+        int spinnerPosition = spinnerLayoutStyle.getSelectedItemPosition();
+
+        if (spinnerPosition == 1) {
+            // If the selected position is 1 (List-based), update the layout to show images in a horizontal list
+            setLayoutStyleForHorizontalList();
+        } else if (isGridBased) {
+            // For grid-based layout, we need to adjust the grid span count based on orientation
+            setGridSpanCount();
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                setGridLayoutForPortrait();
+            } else {
+                setGridLayoutForLandscape();
+            }
+        } else if (!isGridBased) {
+            setLayoutStyleForListBased();
+        }
+        else {}
+    }
+
+
+    private void setGridLayoutForPortrait() {
+        int spanCountPortrait = GRID_SPAN_COUNT_PORTRAIT;
+        recyclerViewMen.setLayoutManager(new GridLayoutManager(this, spanCountPortrait));
+        recyclerViewWomen.setLayoutManager(new GridLayoutManager(this, spanCountPortrait));
+        recyclerViewOthers.setLayoutManager(new GridLayoutManager(this, spanCountPortrait));
+
+        // Use the ImageAdapter for Grid-based layout
+        if (imageAdapterMen == null) {
+            imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
+            recyclerViewMen.setAdapter(imageAdapterMen);
+        } else {
+            imageAdapterMen.setGridBased(isGridBased);
+            recyclerViewMen.setAdapter(imageAdapterMen);
+        }
+
+        if (imageAdapterWomen == null) {
+            imageAdapterWomen = new ImageAdapter(this, imageDataListWomen, isGridBased);
+            recyclerViewWomen.setAdapter(imageAdapterWomen);
+        } else {
+            imageAdapterWomen.setGridBased(isGridBased);
+            recyclerViewWomen.setAdapter(imageAdapterWomen);
+        }
+
+        if (imageAdapterOthers == null) {
+            imageAdapterOthers = new ImageAdapter(this, imageDataListOthers, isGridBased);
+            recyclerViewOthers.setAdapter(imageAdapterOthers);
+        } else {
+            imageAdapterOthers.setGridBased(isGridBased);
+            recyclerViewOthers.setAdapter(imageAdapterOthers);
+        }
+    }
+
+    private void setGridLayoutForLandscape() {
+        int spanCountLandscape = GRID_SPAN_COUNT_LANDSCAPE;
+        recyclerViewMen.setLayoutManager(new GridLayoutManager(this, spanCountLandscape));
+        recyclerViewWomen.setLayoutManager(new GridLayoutManager(this, spanCountLandscape));
+        recyclerViewOthers.setLayoutManager(new GridLayoutManager(this, spanCountLandscape));
+
+        // Use the ImageAdapter for Grid-based layout
+        if (imageAdapterMen == null) {
+            imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
+            recyclerViewMen.setAdapter(imageAdapterMen);
+        } else {
+            imageAdapterMen.setGridBased(isGridBased);
+            recyclerViewMen.setAdapter(imageAdapterMen);
+        }
+
+        if (imageAdapterWomen == null) {
+            imageAdapterWomen = new ImageAdapter(this, imageDataListWomen, isGridBased);
+            recyclerViewWomen.setAdapter(imageAdapterWomen);
+        } else {
+            imageAdapterWomen.setGridBased(isGridBased);
+            recyclerViewWomen.setAdapter(imageAdapterWomen);
+        }
+
+        if (imageAdapterOthers == null) {
+            imageAdapterOthers = new ImageAdapter(this, imageDataListOthers, isGridBased);
+            recyclerViewOthers.setAdapter(imageAdapterOthers);
+        } else {
+            imageAdapterOthers.setGridBased(isGridBased);
+            recyclerViewOthers.setAdapter(imageAdapterOthers);
+        }
+    }
+
+
+    // New method to display images in a horizontal list
+    private void setLayoutStyleForHorizontalList() {
+        // Check if the screen orientation is in landscape mode
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE||getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            // Set LinearLayoutManager for the RecyclerViews
+            LinearLayoutManager layoutManagerMen = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            LinearLayoutManager layoutManagerWomen = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+            LinearLayoutManager layoutManagerOthers = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+
+            recyclerViewMen.setLayoutManager(layoutManagerMen);
+            recyclerViewWomen.setLayoutManager(layoutManagerWomen);
+            recyclerViewOthers.setLayoutManager(layoutManagerOthers);
+
+            // Use the ImageAdapter for List-based layout
+            if (imageAdapterMen == null) {
+                imageAdapterMen = new ImageAdapter(this, imageDataListMen, isGridBased);
+                recyclerViewMen.setAdapter(imageAdapterMen);
+            } else {
+                imageAdapterMen.setGridBased(isGridBased);
+                recyclerViewMen.setAdapter(imageAdapterMen);
+            }
+
+            if (imageAdapterWomen == null) {
+                imageAdapterWomen = new ImageAdapter(this, imageDataListWomen, isGridBased);
+                recyclerViewWomen.setAdapter(imageAdapterWomen);
+            } else {
+                imageAdapterWomen.setGridBased(isGridBased);
+                recyclerViewWomen.setAdapter(imageAdapterWomen);
+            }
+
+            if (imageAdapterOthers == null) {
+                imageAdapterOthers = new ImageAdapter(this, imageDataListOthers, isGridBased);
+                recyclerViewOthers.setAdapter(imageAdapterOthers);
+            } else {
+                imageAdapterOthers.setGridBased(isGridBased);
+                recyclerViewOthers.setAdapter(imageAdapterOthers);
+            }
+        }
+    }
+
+
 
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         if (isGridBased) {
-            int spanCount = newConfig.orientation == Configuration.ORIENTATION_PORTRAIT
-                    ? GRID_SPAN_COUNT_PORTRAIT
-                    : GRID_SPAN_COUNT_LANDSCAPE;
-            setGridSpanCount();
+            updateLayoutStyle(isGridBased);
         }
     }
 }
